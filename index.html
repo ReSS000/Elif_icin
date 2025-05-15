@@ -1,88 +1,209 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kim Dünya'nın En Güzel Kızı</title>
-    <style>
-        body {
-            background: linear-gradient(135deg, #ff758c, #ff7eb3, #ff8aa9, #ff98c5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: "Quicksand", sans-serif;
-            text-align: center;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        /* Kalplerin Arka Planda Görünmesini Sağlayan Yapı */
-        .kalpler {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: -1;
-        }
-
-        .kalp {
-            position: absolute;
-            bottom: -50px;
-            width: 30px;
-            height: 30px;
-            background-color: rgba(255, 100, 150, 0.7);
-            clip-path: polygon(50% 0%, 100% 35%, 85% 100%, 50% 80%, 15% 100%, 0% 35%);
-            animation: kalpUcus 5s infinite linear;
-        }
-
-        @keyframes kalpUcus {
-            0% { transform: translateY(100vh) scale(1); opacity: 1; }
-            100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
-        }
-
-        /* Farklı kalpler rastgele yerlerde belirecek */
-        .kalp:nth-child(1) { left: 10%; animation-duration: 4s; }
-        .kalp:nth-child(2) { left: 25%; animation-duration: 5s; }
-        .kalp:nth-child(3) { left: 40%; animation-duration: 6s; }
-        .kalp:nth-child(4) { left: 55%; animation-duration: 4.5s; }
-        .kalp:nth-child(5) { left: 70%; animation-duration: 5.5s; }
-        .kalp:nth-child(6) { left: 85%; animation-duration: 6.5s; }
-
-        h1 {
-            font-size: 60px;
-            font-weight: bold;
-            text-shadow: 4px 4px 10px rgba(255, 255, 255, 0.5);
-            animation: parlayanYazi 2s infinite alternate;
-        }
-        
-        p {
-            font-size: 24px;
-            font-weight: 500;
-            margin-top: 10px;
-            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.3);
-        }
-
-        @keyframes parlayanYazi {
-            from { transform: scale(1); opacity: 0.8; }
-            to { transform: scale(1.2); opacity: 1; }
-        }
-
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Girl Collects Hearts</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+  body, html {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #ffafbd, #ffc3a0);
+    font-family: 'Poppins', sans-serif;
+    user-select: none;
+  }
+  #gameContainer {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+  }
+  #girl {
+    position: absolute;
+    width: 60px;
+    height: 120px;
+    background: url('Kiz.png') no-repeat center/contain;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: top 0.1s, left 0.1s;
+    z-index: 10;
+    cursor: pointer;
+  }
+  .heart {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: url('kalp.png') no-repeat center/contain;
+    user-select: none;
+  }
+  #message {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 48px;
+    color: #fff;
+    text-shadow: 2px 2px 8px #d80073;
+    display: none;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+</style>
 </head>
 <body>
-    <div class="kalpler">
-        <div class="kalp"></div>
-        <div class="kalp"></div>
-        <div class="kalp"></div>
-        <div class="kalp"></div>
-        <div class="kalp"></div>
-        <div class="kalp"></div>
-    </div>
+  <div id="gameContainer">
+    <div id="girl" tabindex="0"></div>
+    <div class="heart" id="heart1"></div>
+    <div class="heart" id="heart2"></div>
+    <div class="heart" id="heart3"></div>
+  </div>
+  <div id="message">ELİF 💝 RESUL</div>
+<script>
+  (() => {
+    const girl = document.getElementById('girl');
+    const hearts = [
+      document.getElementById('heart1'),
+      document.getElementById('heart2'),
+      document.getElementById('heart3')
+    ];
+    const message = document.getElementById('message');
+    const container = document.getElementById('gameContainer');
+    const containerRect = container.getBoundingClientRect();
 
-    <h1>💖 TABİKİDE ELİF!!! 💖</h1>
-    <p>Senin için en güzel renkler, en güzel kalpler burada! 🌸💖✨</p>
+    // Initialize girl position
+    let girlPos = { x: containerRect.width / 2, y: containerRect.height / 2 };
+    const girlSize = { width: 60, height: 120 };
+    const heartSize = { width: 50, height: 50 };
+
+    // Place hearts randomly inside the container, avoid edges
+    function placeHeartsRandomly() {
+      hearts.forEach(heart => {
+        const x = Math.random() * (containerRect.width - heartSize.width - 40) + 20;
+        const y = Math.random() * (containerRect.height - heartSize.height - 40) + 20;
+        heart.style.left = x + 'px';
+        heart.style.top = y + 'px';
+        heart.style.display = 'block';
+      });
+    }
+
+    placeHeartsRandomly();
+
+    // Update girl position visually
+    function updateGirlPos() {
+      // clamp within container bounds
+      girlPos.x = Math.min(containerRect.width - girlSize.width / 2, Math.max(girlSize.width / 2, girlPos.x));
+      girlPos.y = Math.min(containerRect.height - girlSize.height / 2, Math.max(girlSize.height / 2, girlPos.y));
+      girl.style.left = girlPos.x + 'px';
+      girl.style.top = girlPos.y + 'px';
+    }
+    updateGirlPos();
+
+    // Check collision between girl and hearts
+    function checkCollision(rect1, rect2) {
+      return !(
+        rect1.right < rect2.left ||
+        rect1.left > rect2.right ||
+        rect1.bottom < rect2.top ||
+        rect1.top > rect2.bottom
+      );
+    }
+
+    // Track collected hearts
+    let collected = 0;
+
+    function tryCollectHearts() {
+      const girlRect = girl.getBoundingClientRect();
+
+      hearts.forEach(heart => {
+        if (heart.style.display !== 'none') {
+          const heartRect = heart.getBoundingClientRect();
+          if (checkCollision(girlRect, heartRect)) {
+            heart.style.display = 'none';
+            collected++;
+            if (collected === hearts.length) {
+              showMessage();
+            }
+          }
+        }
+      });
+    }
+
+    function showMessage() {
+      message.style.display = 'block';
+      message.animate([
+        { transform: 'translateX(-50%) translateY(-50px)', opacity: 0 },
+        { transform: 'translateX(-50%) translateY(0)', opacity: 1 }
+      ], {
+        duration: 800,
+        easing: 'ease-out',
+        fill: 'forwards'
+      });
+    }
+
+    // Movement controls: Arrow keys or WASD
+    window.addEventListener('keydown', e => {
+      const step = 15;
+      let moved = false;
+      switch (e.key) {
+        case 'ArrowUp':
+        case 'w':
+        case 'W':
+          girlPos.y -= step;
+          moved = true;
+          break;
+        case 'ArrowDown':
+        case 's':
+        case 'S':
+          girlPos.y += step;
+          moved = true;
+          break;
+        case 'ArrowLeft':
+        case 'a':
+        case 'A':
+          girlPos.x -= step;
+          moved = true;
+          break;
+        case 'ArrowRight':
+        case 'd':
+        case 'D':
+          girlPos.x += step;
+          moved = true;
+          break;
+      }
+      if (moved) {
+        e.preventDefault();
+        updateGirlPos();
+        tryCollectHearts();
+      }
+    });
+
+    // Optional: Allow click or drag functionality on girl
+    let dragging = false;
+    girl.addEventListener('mousedown', e => {
+      dragging = true;
+    });
+    window.addEventListener('mouseup', e => {
+      dragging = false;
+    });
+    window.addEventListener('mousemove', e => {
+      if (dragging) {
+        // Keep girl within bounds
+        let newX = e.clientX;
+        let newY = e.clientY;
+        if (newX < girlSize.width / 2) newX = girlSize.width / 2;
+        if (newX > containerRect.width - girlSize.width / 2) newX = containerRect.width - girlSize.width / 2;
+        if (newY < girlSize.height / 2) newY = girlSize.height / 2;
+        if (newY > containerRect.height - girlSize.height / 2) newY = containerRect.height - girlSize.height / 2;
+        girlPos.x = newX;
+        girlPos.y = newY;
+        updateGirlPos();
+        tryCollectHearts();
+      }
+    });
+  })();
+</script>
 </body>
 </html>
+
