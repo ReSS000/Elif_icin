@@ -24,18 +24,15 @@
     width: 60px;
     height: 120px;
     background: url('Kiz.png') no-repeat center/contain;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    transition: top 0.1s, left 0.1s;
     z-index: 10;
     cursor: pointer;
+    touch-action: none;
   }
   .heart {
     position: absolute;
     width: 50px;
     height: 50px;
-    background: url('Kalp.png') no-repeat center/contain;
+    background: url('kalp.png') no-repeat center/contain;
     user-select: none;
   }
   #message {
@@ -72,12 +69,12 @@
     const container = document.getElementById('gameContainer');
     const containerRect = container.getBoundingClientRect();
 
-    // Initialize girl position
-    let girlPos = { x: containerRect.width / 2, y: containerRect.height / 2 };
+    let girlPos = { x: containerRect.width / 2 - 30, y: containerRect.height / 2 - 60 }; // Ortala
     const girlSize = { width: 60, height: 120 };
     const heartSize = { width: 50, height: 50 };
 
-    // Place hearts randomly inside the container, avoid edges
+    let gameEnded = false; // ✨ yazı çıkınca artık hareket etmesin
+
     function placeHeartsRandomly() {
       hearts.forEach(heart => {
         const x = Math.random() * (containerRect.width - heartSize.width - 40) + 20;
@@ -88,19 +85,13 @@
       });
     }
 
-    placeHeartsRandomly();
-
-    // Update girl position visually
     function updateGirlPos() {
-      // clamp within container bounds
-      girlPos.x = Math.min(containerRect.width - girlSize.width / 2, Math.max(girlSize.width / 2, girlPos.x));
-      girlPos.y = Math.min(containerRect.height - girlSize.height / 2, Math.max(girlSize.height / 2, girlPos.y));
+      girlPos.x = Math.min(containerRect.width - girlSize.width, Math.max(0, girlPos.x));
+      girlPos.y = Math.min(containerRect.height - girlSize.height, Math.max(0, girlPos.y));
       girl.style.left = girlPos.x + 'px';
       girl.style.top = girlPos.y + 'px';
     }
-    updateGirlPos();
 
-    // Check collision between girl and hearts
     function checkCollision(rect1, rect2) {
       return !(
         rect1.right < rect2.left ||
@@ -110,7 +101,6 @@
       );
     }
 
-    // Track collected hearts
     let collected = 0;
 
     function tryCollectHearts() {
@@ -131,6 +121,7 @@
     }
 
     function showMessage() {
+      gameEnded = true;
       message.style.display = 'block';
       message.animate([
         { transform: 'translateX(-50%) translateY(-50px)', opacity: 0 },
@@ -142,8 +133,10 @@
       });
     }
 
-    // Movement controls: Arrow keys or WASD
+    // Klavye ile kontrol
     window.addEventListener('keydown', e => {
+      if (gameEnded) return;
+
       const step = 15;
       let moved = false;
       switch (e.key) {
@@ -179,30 +172,54 @@
       }
     });
 
-    // Optional: Allow click or drag functionality on girl
+    // Mouse ile sürükleme
     let dragging = false;
     girl.addEventListener('mousedown', e => {
+      if (gameEnded) return;
       dragging = true;
     });
     window.addEventListener('mouseup', e => {
       dragging = false;
     });
     window.addEventListener('mousemove', e => {
-      if (dragging) {
-        // Keep girl within bounds
-        let newX = e.clientX;
-        let newY = e.clientY;
-        if (newX < girlSize.width / 2) newX = girlSize.width / 2;
-        if (newX > containerRect.width - girlSize.width / 2) newX = containerRect.width - girlSize.width / 2;
-        if (newY < girlSize.height / 2) newY = girlSize.height / 2;
-        if (newY > containerRect.height - girlSize.height / 2) newY = containerRect.height - girlSize.height / 2;
-        girlPos.x = newX;
-        girlPos.y = newY;
-        updateGirlPos();
-        tryCollectHearts();
+      if (dragging && !gameEnded) {
+        moveGirlTo(e.clientX, e.clientY);
       }
     });
+
+    // Touch (mobil) için
+    girl.addEventListener('touchstart', e => {
+      if (gameEnded) return;
+      e.preventDefault();
+      dragging = true;
+    }, { passive: false });
+
+    window.addEventListener('touchend', e => {
+      dragging = false;
+    });
+
+    window.addEventListener('touchmove', e => {
+      if (dragging && !gameEnded && e.touches.length === 1) {
+        const touch = e.touches[0];
+        moveGirlTo(touch.clientX, touch.clientY);
+      }
+    }, { passive: false });
+
+    function moveGirlTo(x, y) {
+      girlPos.x = Math.min(containerRect.width - girlSize.width, Math.max(0, x - girlSize.width / 2));
+      girlPos.y = Math.min(containerRect.height - girlSize.height, Math.max(0, y - girlSize.height / 2));
+      updateGirlPos();
+      tryCollectHearts();
+    }
+
+    // Başlangıç
+    placeHeartsRandomly();
+    updateGirlPos();
   })();
+</script>
+</body>
+</html>
+
 </script>
 </body>
 </html>
